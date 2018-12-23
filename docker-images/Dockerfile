@@ -7,6 +7,7 @@ COPY qemu-aarch64-static /usr/bin/
 
 ADD . /install
 RUN /install/install.sh
+# Can this go in the install script?
 RUN export PATH=/root/archiconda3/bin:$PATH
 
 # Do we need to remove this?
