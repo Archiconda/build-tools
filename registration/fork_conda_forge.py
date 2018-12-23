@@ -12,7 +12,8 @@ from github import UnknownObjectException
 # To modify the git repository using sane tools
 from git import Repo
 import yaml
-
+from jinja2 import Environment, FileSystemLoader
+from pathlib import Path
 
 def main():
     try:
@@ -36,8 +37,6 @@ def main():
     feedstock_repo = gh.get_repo(f'{source_org}/{package_name}-feedstock')
     try:
         org.create_fork(feedstock_repo)
-        print('Repository already found. Aborting')
-        return
     except UnknownObjectException as e:
         if e.status == 404:
             raise RuntimeError(f'Repository not found: {e.data["message"]}')
@@ -69,8 +68,25 @@ def main():
     r.index.add(['conda-forge.yml'])
     r.index.commit('Added aarch64 to the conda-forge.yml')
     origin = r.remote()
-    origin.push()
     print('Added the tag ``aarch64: true`` to ``conda-forge.yml``. The repo is now ready to get rerendered.')
+    shippable_filename = render_shippable(f'{package_name}-feedstock')
+    r.index.add([shippable_filename.name])
+    r.index.commit('Added shippable.yml')
+    origin.push()
+
+                               
+def render_shippable(forge_dir):
+    content_dir = os.path.abspath(os.path.dirname(__file__))
+    env = Environment(loader=FileSystemLoader([content_dir]))
+    template = env.get_template('shippable.yml.tmpl')
+                               
+    p = Path(forge_dir) / '.ci_support'
+    config = {'configs': [(f.name, None) for f in p.glob('linux*')]}
+    shippable_config_filename = Path(forge_dir) / 'shippable.yml'
+    with open(shippable_config_filename, 'w') as f:
+        f.write(template.render(config))
+    return shippable_config_filename
+
 
 
 if __name__ == '__main__':
