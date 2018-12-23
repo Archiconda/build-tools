@@ -56,11 +56,11 @@ def main():
             sb = forked_repo.get_branch(source_branch)
             forked_repo.create_git_ref(ref='refs/heads/' + target_branch, sha=sb.commit.sha)
             forked_repo.get_branch(target_branch)
-                               
+
     print(f"setting fork's default branch to {target_branch}")
     forked_repo.edit(default_branch=target_branch)
-                               
-    r = Repo.clone_from(forked_repo.ssh_url, f'{package_name}-feedstock')                
+
+    r = Repo.clone_from(forked_repo.ssh_url, f'{package_name}-feedstock')
     with open(f'{package_name}-feedstock/conda-forge.yml') as f:
         y = yaml.load(f)
     y['aarch64'] = True
@@ -71,7 +71,7 @@ def main():
     origin = r.remote()
     origin.push()
     print('Added the tag ``aarch64: true`` to ``conda-forge.yml``. The repo is now ready to get rerendered.')
-                               
-                               
+
+
 if __name__ == '__main__':
     main()
