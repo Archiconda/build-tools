@@ -33,7 +33,8 @@ build:
     - conda update conda-build --yes
     - conda install anaconda-client --yes
     # For noarch packages
-    - conda config --add channels conda-forge
+    # - conda config --add channels conda-forge
+    - conda config --add channels archiarm
     - conda build -m .ci_support/${CONFIG}.yaml .
     - export PACKAGE_NAME=`conda build -m .ci_support/${CONFIG}.yaml . --output`
     - if [[ "$BINSTAR_TOKEN" != "" ]]; then anaconda -t $BINSTAR_TOKEN upload $PACKAGE_NAME ; else echo "BINSTAR_TOKEN not found, package is not being uploaded" ; fi

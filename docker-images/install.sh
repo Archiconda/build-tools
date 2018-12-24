@@ -19,6 +19,9 @@ export PATH=/root/archiconda3/bin:$PATH
 conda update --all --yes
 conda install conda-build --yes
 conda clean --all --yes
+source /root/archiconda3/bin/activate root
+conda config --add channels conda-forge
+conda config --add channels archiarm
 echo "============ Successfully Installed Archiconda3 ==============="
 
 echo "========================= Clean apt-get ========================"
