@@ -2,3 +2,5 @@ installer/Archiconda3-*-Linux-aarch*.sh
 
 docker-images/Archiconda3-*-Linux-*.sh
 docker-images/qemu-*-static
+
+registration/*-feedstock
