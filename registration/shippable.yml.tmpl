@@ -28,10 +28,8 @@ build:
     - source /root/archiconda3/bin/activate root
     - conda --version
     - conda config --show
-    - conda update conda --yes
+    - conda update conda conda-build anaconda-client --yes
     - conda --version
-    - conda update conda-build --yes
-    - conda install anaconda-client --yes
     # For noarch packages
     # - conda config --add channels conda-forge
     - conda config --add channels archiarm
