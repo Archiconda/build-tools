@@ -7,7 +7,10 @@ runtime:
 {% block env -%}
 env:
   global:
-  - secure: bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw==
+  # Archiconda account
+  # - secure: bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw==
+  # hmaarrfk's account
+  - secure: QtD5PjVUiKUE2sWfizcoTUdaGWgmY8gZnarWImh2wq+1gSmibYr43Cx0aqSLz03bQiHDjH/H3Hts45cVjY7CFD3fzaIiO8AFwfOHablqIU7O9QmKxLnF1/rIdc4A+gAdUmkdVq/pTs56xhfKXnSVnhI+uCHgTKGGxVTHURJroX+HZWGv1Qu2qoPNkUqmJcj405XJUOjS3PbzWHh+5vSK+u50LspjytrU22rbyeS+Wwa4KazCiZm9eOvqcqAyYF9NZUXV/6jxxqWQQhU54jyOmjIB2mmTu1TPSrAKHsEGyHc07OFqkdm68W9vvf73chXYVNXMKlVxbd5D1585C10p2w==
   matrix:
     {%- for config, _ in configs %}
     - CONFIG={{ config }}
