@@ -135,7 +135,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--source_org', type=str, default='conda-forge',
                         help='The source organization to clone from')
-    parser.add_argument('--org', type=str, default='archiconda',
+    parser.add_argument('--org', type=str, default='Archiconda',
                         help='The destimation organization (or user) where to fork to.')
     parser.add_argument('--token-dir', type=Path, default=Path('~/.archiconda'),
                         help='The directory where to find the tokens.')
