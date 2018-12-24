@@ -121,7 +121,9 @@ def render_shippable(forge_dir):
     template = env.get_template('shippable.yml.tmpl')
 
     p = Path(forge_dir) / '.ci_support'
-    config = {'configs': [(f.stem, None) for f in p.glob('linux*')]}
+    config = {'configs': [(f.stem, None) 
+                          for f in p.glob('linux*') 
+                          if 'gcc' not in f.stem]}
     shippable_config_filename = Path(forge_dir) / 'shippable.yml'
     with open(shippable_config_filename, 'w') as f:
         f.write(template.render(config))
