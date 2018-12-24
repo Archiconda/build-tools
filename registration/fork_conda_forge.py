@@ -16,7 +16,86 @@ from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 import argparse
 
+
+# We need to screen scrape
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+import chromedriver_binary  # Adds chromedriver binary to path
+from tqdm import tqdm
+import os
+import pickle
+from pathlib import Path
 from time import sleep
+
+from time import sleep
+
+def load_cookie(driver, path):
+    with open(path, 'rb') as cookiesfile:
+        cookies = pickle.load(cookiesfile)
+        for cookie in cookies:
+            driver.add_cookie(cookie)
+
+def enable_repo_on_shippable(token_dir='~/.archiconda/', org_name='Archiconda', repository_names=None):
+    if repository_names is None:
+        return
+    cookie_filename = (Path(token_dir) / 'chromecookies.pickle').expanduser()
+
+    driver = webdriver.Chrome()
+
+    # Not really true, but a maybe we are logged in
+    logged_in = True
+
+    # We want to load the cookies for github and shippable
+    driver.get('https://github.com')
+    driver.get('https://shippable.com')
+    if cookie_filename.exists():
+        load_cookie(driver, cookie_filename)
+    driver.get(f'https://app.shippable.com/subs/github/{org_name}/enable')
+    # wait for rendering
+    for i in tqdm(range(20), desc='Page rendering'):
+        sleep(2/20)
+
+    # Try to find the refresh button, it will exist if the user is logged in
+    try:
+        button = driver.find_element_by_css_selector(
+        '#wrapper > div.content-page > div > div > ui-view > div > div.panel.panel-default.panel-border > div.panel-body > div:nth-child(1) > div > div > div > button')
+    except NoSuchElementException as e:
+        print("Unfortunately, the Shippable API doesn't allow free users to automatically enable repos.")
+        print("Therefore, we are resorting to screen-scraping.")
+        print('You must login to Shippable with your GitHub account.')
+        print('Please loging then press enter to continue.')
+        input('')
+        with open(cookie_filename, 'wb+') as f:
+            print('saving')
+            pickle.dump(driver.get_cookies(), f)
+
+    driver.get(f'https://app.shippable.com/subs/github/{org_name}/enable')
+    # wait for rendering
+    for i in tqdm(range(20), desc='Page rendering'):
+        sleep(2/20)
+    button = driver.find_element_by_css_selector(
+        '#wrapper > div.content-page > div > div > ui-view > div > div.panel.panel-default.panel-border > div.panel-body > div:nth-child(1) > div > div > div > button')
+    button.click()
+    for i in tqdm(range(20), desc='Synchornizing SCMs'):
+        sleep(10/20)
+
+    search_input = driver.find_element_by_css_selector(
+            '#completedJobs > div > div.row > div > div > input')
+    for repo_name in repository_names:
+        search_input.clear()
+        search_input.send_keys(repo_name)
+        try:
+            reponame_disabled = driver.find_element_by_css_selector(
+                '#completedJobs > div > div.table-responsive > table > tbody > tr.ng-scope > td:nth-child(1) > span')
+            enable_button = driver.find_element_by_css_selector(
+                '#completedJobs > div > div.table-responsive > table > tbody > tr.ng-scope > td:nth-child(2) > span')
+            enable_button.click()
+            for i in tqdm(range(20), desc=f'Enabling repo: "{repo_name}"'):
+                sleep(10/20)
+        except NoSuchElementException as e:
+            reponame = driver.find_element_by_css_selector(
+                '#completedJobs > div > div.table-responsive > table > tbody > tr.ng-scope > td:nth-child(1) > a')
+            print(f'repo "{repo_name}" already enabled ')
 
 def create_aarch64_branch(repo, aarch64_default=True):
     source_branch = 'master'
@@ -43,7 +122,7 @@ def fork_repo(gh, *, org, package_name, source_org):
         return forked_repo
     except UnknownObjectException:
         pass
-    
+
     # Else, now try to fork it from the origin
     feedstock_repo = gh.get_repo(f'{source_org}/{package_name}-feedstock')
     try:
@@ -53,7 +132,7 @@ def fork_repo(gh, *, org, package_name, source_org):
             raise RuntimeError(f'Repository not found: {e.data["message"]}')
         else:
             raise e
-                               
+
 def get_github_token(token_dir):
     try:
         github_token_filename = (token_dir / 'github.token').expanduser()
@@ -85,13 +164,9 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
         feedstock_name = f'{package_name}-feedstock'
         forked_repo = gh.get_repo(f'{org.login}/{feedstock_name}')
         create_aarch64_branch(forked_repo, aarch64_default=aarch64_default)
-    print('Befeore continuing, please enable the repositories on Shippable')
-    print('Go to ')
-    print(f'https://app.shippable.com/subs/github/{org_name}/enable')
-    print('And enable the repositories:')
-    print(f'{[p + "-feedstock" for p in package_names]}')
-    input('Press enter to continue...')
-          
+
+    enable_repo_on_shippable(token_dir, org_name=org_name, repository_names=[f'{p}-feedstock' for p in package_names])
+
     for package_name in package_names:
         feedstock_name = f'{package_name}-feedstock'
 
@@ -121,8 +196,8 @@ def render_shippable(forge_dir):
     template = env.get_template('shippable.yml.tmpl')
 
     p = Path(forge_dir) / '.ci_support'
-    config = {'configs': [(f.stem, None) 
-                          for f in p.glob('linux*') 
+    config = {'configs': [(f.stem, None)
+                          for f in p.glob('linux*')
                           if 'gcc' not in f.stem]}
     shippable_config_filename = Path(forge_dir) / 'shippable.yml'
     with open(shippable_config_filename, 'w') as f:
@@ -141,9 +216,9 @@ if __name__ == '__main__':
                         help='The directory where to find the tokens.')
     parser.add_argument('package_names', nargs='+', type=str,
                         help='packages to fork and create')
-    parser.add_argument('--no-change-master-branch', 
+    parser.add_argument('--no-change-master-branch',
                         dest='aarch64_default', action='store_false',
-                        help='If provided, the master branch of the repo will be left unchanged.')    
+                        help='If provided, the master branch of the repo will be left unchanged.')
     parser.set_defaults(aarch64_default=True)
     args = parser.parse_args()
     package_names = args.package_names
