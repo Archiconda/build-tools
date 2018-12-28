@@ -19,18 +19,24 @@ env:
 
 build:
   pre_ci_boot:
-    image_name: archiconda/archiconda3
-    image_tag: ubuntu1604_gcc7
+    image_name: arm64v8/ubuntu
+    image_tag: 16.04
     pull: True
 
   ci:
-    # - export PATH=/root/archiconda3/bin:$PATH
+    # Need to install bzip2 for conda
+    - apt-get update
+    - apt-get install -y bzip2
+    - curl -L -O https://github.com/Archiconda/build-tools/releases/download/0.1.1/Archiconda3-0.1.1-Linux-aarch64.sh
+    - bash Archiconda3-*.sh -b
     - source /root/archiconda3/bin/activate root
     - conda --version
-    - conda config --show
-    - conda update conda conda-build anaconda-client --yes
+    - conda update conda --yes
     - conda --version
+    - conda install conda-build anaconda-client --yes
+    - conda config --show
     # For noarch packages
+    # But for now, they all crash
     # - conda config --add channels conda-forge
     - conda config --add channels archiarm
     - conda build -m .ci_support/${CONFIG}.yaml .

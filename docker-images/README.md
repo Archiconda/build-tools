@@ -1,3 +1,7 @@
+This image has been deprecated in favour of isntalling the necessary packages
+at runtime on shippable.
+
+
 # Building docker images
 
 To build the docker images, it is probably easiest to build them on an x86
