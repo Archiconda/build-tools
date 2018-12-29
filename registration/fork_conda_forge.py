@@ -184,9 +184,15 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
         repo.index.commit('Added aarch64 to the conda-forge.yml')
         origin = repo.remotes['origin']
         print('Added the tag ``aarch64: true`` to ``conda-forge.yml``. The repo is now ready to get rerendered.')
-        shippable_filename = render_shippable(f'{package_name}-feedstock')
-        repo.index.add([shippable_filename.name])
-        repo.index.commit('Added shippable.yml')
+        with open('conda-forge.yml', 'a+') as f:
+            f.write(
+'''shippable:
+secure: {BINSTAR_TOKEN: bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw==}
+''')
+        repo.index.add('conda-forge.yml')
+        repo.index.commit('added shippable secret')
+        sp.run(['conda', 'smithy', 'rerender', '--no-check-uptodate', '--feedstock_directory', feedstock_name])
+        repo.index.commit('Rerendered for shippable (aarch64)')
         origin.push()
 
 
