@@ -175,22 +175,16 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
         feedstock_repo = gh.get_repo(f'{source_org}/{package_name}-feedstock')
         repo.create_remote('upstream', feedstock_repo.ssh_url)
         repo.remotes['upstream'].pull('master')
-        with open(f'{feedstock_name}/conda-forge.yml') as f:
-            y = yaml.load(f)
-        y['aarch64'] = True
-        with open(f'{feedstock_name}/conda-forge.yml', 'w') as f:
-            f.write(yaml.dump(y))
-        repo.index.add(['conda-forge.yml'])
-        repo.index.commit('Added aarch64 to the conda-forge.yml')
-        origin = repo.remotes['origin']
-        print('Added the tag ``aarch64: true`` to ``conda-forge.yml``. The repo is now ready to get rerendered.')
-        with open('conda-forge.yml', 'a+') as f:
+        with open(f'{feedstock_name}/conda-forge.yml', 'a+') as f:
             f.write(
 '''shippable:
-secure: {BINSTAR_TOKEN: bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw==}
+  secure: {BINSTAR_TOKEN: bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw==}
 ''')
-        repo.index.add('conda-forge.yml')
+        repo.index.add(['conda-forge.yml'])
         repo.index.commit('added shippable secret')
+        origin = repo.remotes['origin']
+        print('Added the tag ``aarch64: true`` to ``conda-forge.yml``. The repo is now ready to get rerendered.')
+        import subprocess as sp
         sp.run(['conda', 'smithy', 'rerender', '--no-check-uptodate', '--feedstock_directory', feedstock_name])
         repo.index.commit('Rerendered for shippable (aarch64)')
         origin.push()
