@@ -29,6 +29,8 @@ from time import sleep
 
 from time import sleep
 
+import requests
+
 def load_cookie(driver, path):
     with open(path, 'rb') as cookiesfile:
         cookies = pickle.load(cookiesfile)
@@ -84,6 +86,7 @@ def enable_repo_on_shippable(token_dir='~/.archiconda/', org_name='Archiconda', 
     for repo_name in repository_names:
         search_input.clear()
         search_input.send_keys(repo_name)
+        sleep(1)
         try:
             reponame_disabled = driver.find_element_by_css_selector(
                 '#completedJobs > div > div.table-responsive > table > tbody > tr.ng-scope > td:nth-child(1) > span')
@@ -147,6 +150,38 @@ def get_github_token(token_dir):
             'Go to https://github.com/settings/tokens/new and generate\n'
             f'a token with repo access. Put it in {github_token_filename}')
 
+
+def get_shippable_token(token_dir):
+    try:
+        shippable_token_filename = (token_dir / 'shippable.token').expanduser()
+        with open(shippable_token_filename, 'r') as fh:
+            shippable_token = fh.read().strip()
+        if not shippable_token:
+            raise ValueError()
+        return shippable_token
+    except (IOError, ValueError):
+        raise RuntimeError(
+            'No shippable token found for archiconda on shippable. \n'
+            'Go to http://docs.shippable.com/platform/api/api-tokens/\n'
+            'and follow the instructions to get a token.\n'
+            f'Put it in {shippable_token_filename}')
+
+                               
+def get_shippable_project_id(token, project_full_name):
+    params = {'sortBy': 'createdAt', 'sortOrder': '-1', 'projectFullNames': project_full_name}
+    headers = {'Authorization': 'apiToken {}'.format(token)}
+    url = 'https://api.shippable.com/projects'
+    result = requests.get(url=url, params=params, headers=headers)
+    n_results = len(result.json())
+    if not n_results:
+        raise RuntimeError('Could not find the activated repository. Make sure it exists on shippable.')
+    elif n_results > 1:
+        raise RuntimeError("Found multiple repositories, linking to the first one. This really shouldn't happen")
+    # projectId seems like a short name
+    # the real variable we need is id
+    return result.json()[0]['id']
+
+
 def main(package_names, source_org, org_name, token_dir, aarch64_default):
     print(f'Will fork the following feedstocks {package_names}')
     print(f'from: {source_org}')
@@ -158,28 +193,36 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
     org = gh.get_user()
     if org.login != org_name:
         org = gh.get_organization(org_name)
-
+    
     for package_name in package_names:
         fork_repo(gh, org=org, package_name=package_name, source_org=source_org)
         feedstock_name = f'{package_name}-feedstock'
         forked_repo = gh.get_repo(f'{org.login}/{feedstock_name}')
         create_aarch64_branch(forked_repo, aarch64_default=aarch64_default)
-
+    
     enable_repo_on_shippable(token_dir, org_name=org_name, repository_names=[f'{p}-feedstock' for p in package_names])
-
+    
+    shippable_token = get_shippable_token(token_dir)
+    
     for package_name in package_names:
         feedstock_name = f'{package_name}-feedstock'
-
+        full_repo_name = f'{org.login}/{feedstock_name}'
+        forked_repo = gh.get_repo(f'{org.login}/{feedstock_name}')
         repo = Repo.clone_from(forked_repo.ssh_url, f'{feedstock_name}')
         repo.git.checkout('-B', 'aarch64', 'origin/aarch64')
         feedstock_repo = gh.get_repo(f'{source_org}/{package_name}-feedstock')
         repo.create_remote('upstream', feedstock_repo.ssh_url)
         repo.remotes['upstream'].pull('master')
-        with open(f'{feedstock_name}/conda-forge.yml', 'a+') as f:
-            f.write(
-'''shippable:
-  secure: {BINSTAR_TOKEN: bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw==}
-''')
+        with open(f'{feedstock_name}/conda-forge.yml', 'r') as f:
+            y = yaml.load(f)
+        projectId = get_shippable_project_id(shippable_token, full_repo_name)
+        shippable_dict = {
+            'projectId': str(projectId),
+            'secret': {
+                'BINSTAR_TOKEN': 'bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw=='}}
+        y['shippable'] = shippable_dict
+        with open(f'{feedstock_name}/conda-forge.yml', 'w') as f:
+            f.write(yaml.dump(y))
         repo.index.add(['conda-forge.yml'])
         repo.index.commit('added shippable secret')
         origin = repo.remotes['origin']
