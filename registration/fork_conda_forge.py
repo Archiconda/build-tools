@@ -117,7 +117,7 @@ def create_aarch64_branch(repo, aarch64_default=True):
 
 def fork_repo(gh, *, org, package_name, source_org):
     forked_repo = gh.get_repo(f'{org.login}/{package_name}-feedstock')
-    print('Checking to see if repository exists on Github')
+    print(f'Checking to see if {forked_repo.full_name} exists on Github')
     try:
         # Check that the repo actually exists
         # Printing the name or any property of the repo issues this check
@@ -166,7 +166,7 @@ def get_shippable_token(token_dir):
             'and follow the instructions to get a token.\n'
             f'Put it in {shippable_token_filename}')
 
-                               
+
 def get_shippable_project_id(token, project_full_name):
     params = {'sortBy': 'createdAt', 'sortOrder': '-1', 'projectFullNames': project_full_name}
     headers = {'Authorization': 'apiToken {}'.format(token)}
@@ -193,17 +193,24 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
     org = gh.get_user()
     if org.login != org_name:
         org = gh.get_organization(org_name)
-    
+
+    feedstock_names = [f'{package_name}-feedstock'
+                       for package_name in package_names]
+    repo_full_names = [f'{org.login}/{feedstock_name}'
+                       for feedstock_name in feedstock_names]
     for package_name in package_names:
         fork_repo(gh, org=org, package_name=package_name, source_org=source_org)
-        feedstock_name = f'{package_name}-feedstock'
-        forked_repo = gh.get_repo(f'{org.login}/{feedstock_name}')
+
+    # Github might take a bit of time create the repositories.
+    sleep(1)
+    for repo_full_name in repo_full_names:
+        forked_repo = gh.get_repo(repo_full_name)
         create_aarch64_branch(forked_repo, aarch64_default=aarch64_default)
-    
+
     enable_repo_on_shippable(token_dir, org_name=org_name, repository_names=[f'{p}-feedstock' for p in package_names])
-    
+
     shippable_token = get_shippable_token(token_dir)
-    
+
     for package_name in package_names:
         feedstock_name = f'{package_name}-feedstock'
         full_repo_name = f'{org.login}/{feedstock_name}'
@@ -218,7 +225,7 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
         projectId = get_shippable_project_id(shippable_token, full_repo_name)
         shippable_dict = {
             'projectId': str(projectId),
-            'secret': {
+            'secure': {
                 'BINSTAR_TOKEN': 'bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw=='}}
         y['shippable'] = shippable_dict
         with open(f'{feedstock_name}/conda-forge.yml', 'w') as f:
