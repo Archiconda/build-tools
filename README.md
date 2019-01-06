@@ -134,3 +134,28 @@ COPY qemu-aarch64-static /usr/bin/
 
 and you should be gravy.
 
+
+### Bulding using qemu and docker
+
+I've found that it can be helpful to build and test using qemu and docker.
+It might be as simple as iterating quickly to find what dependencies were missing from
+the original packages.
+
+Often, binutils are hardcoded, so you have to pass compilation flags to tell the build
+system what `ar` command to use.
+
+It might be useful to mount a local directory to use with the docker build system.
+
+For example, the following command mounts the registration directory which 
+contains a bunch of feedstocks and runs the `archiconda/centos7` image.
+The first command it runs is `bash` allows you to interact with the system.
+
+```
+docker run -v /home/mark2/git/aarch64/build-tools/registration:/feedstocks -i -t archiconda/centos7 bash
+```
+
+Be warned, CPU emulation is SLOW and will make your computer crawl.
+
+I started compiling `cmake` at the same time it did on shippable, and didn't even get through the
+bootstrap when it has finished compiling.
+
