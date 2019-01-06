@@ -1,10 +1,9 @@
-name: Archiconda3
-version: 0.1.1
+name: Archiconda3Builder
+version: 0.1.2
 
 channels:
-  - https://conda.anaconda.org/jjhelmus/label/aarch64_bootstrap
-
-conda_default_channels:
+  - https://conda.anaconda.org/archiarm
+  - https://conda.anaconda.org/c4aarch64
   - https://conda.anaconda.org/jjhelmus/label/aarch64_bootstrap
 
 write_condarc: True
@@ -14,3 +13,5 @@ specs:
   - python 3.7
   - conda
   - pip
+  - anaconda-client
+  - conda-build

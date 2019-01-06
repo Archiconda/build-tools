@@ -116,14 +116,16 @@ def create_aarch64_branch(repo, aarch64_default=True):
         repo.edit(default_branch=target_branch)
 
 def fork_repo(gh, *, org, package_name, source_org):
-    forked_repo = gh.get_repo(f'{org.login}/{package_name}-feedstock')
-    print(f'Checking to see if {forked_repo.full_name} exists on Github')
+    repo_full_name = f'{org.login}/{package_name}-feedstock'
+    forked_repo = gh.get_repo(repo_full_name)
+    print(f'Checking to see if {repo_full_name} exists on Github')
     try:
         # Check that the repo actually exists
         # Printing the name or any property of the repo issues this check
         print(f'{forked_repo.full_name} already exists, not forking it again.')
         return forked_repo
     except UnknownObjectException:
+        print(f'{repo_full_name} does not exists on Github, will fork')
         pass
 
     # Else, now try to fork it from the origin
