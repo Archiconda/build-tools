@@ -233,7 +233,7 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
         with open(f'{feedstock_name}/conda-forge.yml', 'w') as f:
             f.write(yaml.dump(y))
         repo.index.add(['conda-forge.yml'])
-        repo.index.commit('added shippable secret')
+        repo.index.commit('added shippable secure BINSTAR_TOKEN')
         origin = repo.remotes['origin']
         print('Added the tag ``aarch64: true`` to ``conda-forge.yml``. The repo is now ready to get rerendered.')
         import subprocess as sp
