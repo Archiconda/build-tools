@@ -78,7 +78,7 @@ def enable_repo_on_shippable(token_dir='~/.archiconda/', org_name='Archiconda', 
     button = driver.find_element_by_css_selector(
         '#wrapper > div.content-page > div > div > ui-view > div > div.panel.panel-default.panel-border > div.panel-body > div:nth-child(1) > div > div > div > button')
     button.click()
-    for i in tqdm(range(20), desc='Synchornizing SCMs'):
+    for i in tqdm(range(30), desc='Synchornizing SCMs'):
         sleep(10/20)
 
     search_input = driver.find_element_by_css_selector(
@@ -93,12 +93,15 @@ def enable_repo_on_shippable(token_dir='~/.archiconda/', org_name='Archiconda', 
             enable_button = driver.find_element_by_css_selector(
                 '#completedJobs > div > div.table-responsive > table > tbody > tr.ng-scope > td:nth-child(2) > span')
             enable_button.click()
-            for i in tqdm(range(20), desc=f'Enabling repo: "{repo_name}"'):
-                sleep(10/20)
+            print(f'Enabling repo: "{repo_name}"')
+            sleep(1)
         except NoSuchElementException as e:
             reponame = driver.find_element_by_css_selector(
                 '#completedJobs > div > div.table-responsive > table > tbody > tr.ng-scope > td:nth-child(1) > a')
             print(f'repo "{repo_name}" already enabled ')
+    search_input.clear()
+    for i in tqdm(range(15), desc=f'Waiting for repos to get enabled'):
+        sleep(10/20)
 
 def create_aarch64_branch(repo, aarch64_default=True):
     source_branch = 'master'
@@ -244,7 +247,24 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
         repo.index.add(['conda-forge.yml'])
         repo.index.commit('added shippable secure BINSTAR_TOKEN')
         origin = repo.remotes['origin']
-        print('Added the tag ``aarch64: true`` to ``conda-forge.yml``. The repo is now ready to get rerendered.')
+        print('Added the tag shippable secret and projectId, repo ready for rerendering.')
+
+        # lazy way to take off noarch
+        # can't really use yaml since there is a bunch of jinja syntax
+        with open(f'{feedstock_name}/recipe/meta.yaml', 'r') as f:
+            all_lines = f.readlines()
+        try:
+            noarch_index = [line.strip().startswith('noarch: python')
+                            for line in all_lines].index(True)
+            print('found noarch python. removing it')
+            with open(f'{feedstock_name}/recipe/meta.yaml', 'w') as f:
+                f.writelines(all_lines[:noarch_index])
+                f.writelines(all_lines[noarch_index+1:])
+            repo.index.add(['recipe/meta.yaml'])
+            repo.index.commit('removed noarch: python')
+        except ValueError:
+            pass
+
         import subprocess as sp
         sp.run(['conda', 'smithy', 'rerender', '--no-check-uptodate', '--feedstock_directory', feedstock_name])
         repo.index.commit('Rerendered for shippable (aarch64)')
