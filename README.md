@@ -55,7 +55,7 @@ For now, these are the necessary packages:
   - yaml-0.1.7-h14c3975_3
   - zlib-1.2.11-h14c3975_1003
   - libedit-3.1.20170329-hf8c457e_1001
-  - readline-7.0-h7ce4240_5
+  - ~~readline-7.0-h7ce4240_5~~ no, nobody wants readline.
   - tk-8.6.8-h14c3975_0
   - sqlite-3.26.0-hf8c457e_1000
   - asn1crypto-0.24.0-py37_1003
