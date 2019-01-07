@@ -122,6 +122,17 @@ build.
 
 # How to start:
 
+## system requirements
+
+```
+python
+conda
+conda constructor
+selenium
+chromedriver-binary
+python-chromedriver-binary
+```
+
 ## Be friends with jjhelmus
 
 He will build the following critial packages:
