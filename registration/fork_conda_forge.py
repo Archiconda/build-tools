@@ -230,6 +230,15 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
             'secure': {
                 'BINSTAR_TOKEN': 'bkTdATvev7sVFsP62xFV2ck215nXEtH7eWXdhzRRtbzeKquSkNhTGTCoa5FcLDvAVe36w+Sv59/3/oWNyMood8pIWjHLMC5CqqLdc4NRmyyaCKWys4CLhTTurIBPFSWUilxZW1KCKv/WHOe+zQDi2o9R9lf5/MizuwThHSQOIcqeTIn4wtPzbne5MeKSW+mRCsb+l4E/Q1oY2w/mTJ+izDWkxefstZ2t8RqOxH6H20wwNOOj/1WdeztdCOtCAl99r8Aj58odGyfUMAEyw89c5HglAEPurBQs21DZbHp10NmgSLyIbukplulRUm+cQ37loT/hFfTjPUCqLEC3lu6SPw=='}}
         y['shippable'] = shippable_dict
+
+        if 'compiler_stack' not in y:
+            print(f'We added the compiler stack to           {feedstock_name}')
+
+        # add the compiler stack all the time because i'm lazy
+        y['compiler_stack'] = 'comp7'
+        y['max_py_ver'] = '37'
+        y['max_r_ver'] = '35'
+
         with open(f'{feedstock_name}/conda-forge.yml', 'w') as f:
             f.write(yaml.dump(y))
         repo.index.add(['conda-forge.yml'])
