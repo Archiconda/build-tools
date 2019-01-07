@@ -1,0 +1,16 @@
+name: Archiconda2
+version: 0.2.0
+
+channels:
+  - https://conda.anaconda.org/archiarm
+  #- https://conda.anaconda.org/jjhelmus/label/aarch64_bootstrap
+
+write_condarc: True
+license_file: ../installer_license.txt
+
+specs:
+  - python 2.7.15
+  - conda
+  - pip
+  #- anaconda-client
+  #- conda-build
