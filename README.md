@@ -22,6 +22,95 @@ Once that is layed out, we will be working toward backporting much of this work 
 6. [ ] Figure out how to generate the depency tree for all packages.
 7. [x] Start rebuilding a few packages
 
+# How far along the stack do we need to go:
+
+For users to install Archiconda3, they need to be able to install the `conda` package.
+`conda-build`, and `anaconda-client` do not need to be in that package, they can be
+obtained from `conda-forge` directly.
+
+What this means, is that every package that `conda` depends on, to run, needs to be
+an arch specific package. The packages used to build those package do not need to
+be arch specific packages.
+
+For now, these are the necessary packages:
+
+  - python-3.7.0-hab5db58_3
+  - ca-certificates-2018.11.29-ha4d7672_0
+  - conda-env-2.6.0-1
+  - libgcc-ng-7.3.0-h5c90dd9_0
+  - libstdcxx-ng-7.3.0-h5c90dd9_0
+  - libffi-3.2.1-h38784ca_1005
+  - ncurses-6.1-hf484d3e_1002
+  - openssl-1.0.2p-h14c3975_1002
+  - xz-5.2.4-h14c3975_1001
+  - yaml-0.1.7-h14c3975_3
+  - zlib-1.2.11-h14c3975_1003
+  - libedit-3.1.20170329-hf8c457e_1001
+  - readline-7.0-h7ce4240_5
+  - tk-8.6.8-h14c3975_0
+  - sqlite-3.26.0-hf8c457e_1000
+  - asn1crypto-0.24.0-py37_1003
+  - certifi-2018.11.29-py37_1000
+  - chardet-3.0.4-py37_1
+  - idna-2.7-py37_0
+  - pycosat-0.6.3-py37h14c3975_0
+  - pycparser-2.19-py37_0
+  - pysocks-1.6.8-py37_0
+  - ruamel_yaml-0.15.64-py37h14c3975_0
+  - six-1.12.0-py37_1000
+  - cffi-1.11.5-py37hb7f436b_1
+  - setuptools-40.6.3-py37_0
+  - cryptography-2.3.1-py37hb7f436b_1
+  - wheel-0.32.3-py37_0
+  - pip-18.1-py37_1000
+  - pyopenssl-18.0.0-py37_0
+  - urllib3-1.23-py37_0
+  - requests-2.19.1-py37_0
+  - conda-4.5.12-py37_1000
+
+
+# Limitations of the approach
+
+We are basically compute bound at this point. shippable gives us 1 CI to use at a time (for one organization).
+
+1 build, even for a nearly empty pure python package, takes about 3 minutes.
+
+See for example the package setuptools:
+https://app.shippable.com/github/Archiconda/setuptools-feedstock/dashboard
+
+The 3 minutes (180 seconds) are broken up as follows:
+
+- 15s Shippable things we have no control over
+- 5 seconds updating ubuntu's cache of apt
+- 4 seconds installing bzip2 and curl
+- 2 seconds downloading Archiconda3
+- 40 seconds installing Archiconda3 (including conda-build and anaconda-client)
+- 100 seconds building the package
+- 5 seconds getting the package name
+- 5 seconds to upload the package
+- 1 second leaning up.
+
+We can maybe cut 50 seconds of this by uploading our own container.
+
+But ultimately, we only have 1 CI, with 1 parallel job at a time, so we cannot run too many
+feedstocks at once.
+
+It does have 96 cores, so maybe we can find a different way to parallelize things? I really feel
+like that might be over complicating things.
+
+# How to speed things up
+
+I haven't had many problems compiling standard software.
+
+For example, python compiled on the first shot, and the issues were primarely due to the fact
+that some software hardcodes binutil dependencies.
+
+Therefore, we can potentially not have shippable automatically get triggered.
+
+Users would have to wait until a regular linux 64 bit build passes, before triggering the shippable
+build.
+
+
 # How to start:
 
 ## Be friends with jjhelmus
@@ -146,7 +235,7 @@ system what `ar` command to use.
 
 It might be useful to mount a local directory to use with the docker build system.
 
-For example, the following command mounts the registration directory which 
+For example, the following command mounts the registration directory which
 contains a bunch of feedstocks and runs the `archiconda/centos7` image.
 The first command it runs is `bash` allows you to interact with the system.
 
