@@ -266,7 +266,9 @@ def main(package_names, source_org, org_name, token_dir, aarch64_default):
             pass
 
         import subprocess as sp
-        sp.run(['conda', 'smithy', 'rerender', '--no-check-uptodate', '--feedstock_directory', feedstock_name])
+        sp.run(['conda', 'smithy', 'rerender', '--no-check-uptodate',
+                '-e', 'conda_build_config.yaml',
+                '--feedstock_directory', feedstock_name])
         repo.index.commit('Rerendered for shippable (aarch64)')
         origin.push()
 

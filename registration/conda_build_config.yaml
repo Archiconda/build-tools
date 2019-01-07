@@ -435,7 +435,8 @@ numpy:
 occt:
   - 7.3
 openblas:
-  - 0.3.3
+  - 0.3.3      # [not aarch64]
+  - 0.3.5      # [aarch64]
 openjpeg:
   - 2.3
 openssl:
