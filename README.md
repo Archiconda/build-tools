@@ -17,10 +17,19 @@ Once that is layed out, we will be working toward backporting much of this work 
 2. [x] Upload it to github
 3. [x] Create the shippable template that installs the Archiconda installer.
 4. [x] Cereate an anaconda channel.
-4. [ ] Create the pinnings for Archiconda
+4. [ ] Create the pinnings for Archiconda *kinda done*
 5. [x] Create the templates for the different conda-smithy compatible
 6. [ ] Figure out how to generate the depency tree for all packages.
 7. [x] Start rebuilding a few packages
+8. [ ] Create barebones Archiconda3 (3.7.1) and Archiconda2 (2.7.15) installers
+9. [ ] Build remaining packages necessary to install `conda-build` and `anaconda-client` using
+       archiconda + conda-forge.
+9. [ ] Create a [meta-channel](https://github.com/regro/conda-metachannel) for conda-forge for things to resolve faster
+10. [ ] Create a new docker image for archiarm
+     - Must have conda-build + anaconda-client installed
+     - Prefetch the compilers
+     - Prefetch numpy + dependencies???? (we never compiled this yet)
+     - Prefetch pytest???
 
 # How far along the stack do we need to go:
 

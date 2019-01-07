@@ -1,4 +1,4 @@
-all: qemu-aarch64-static Archiconda3Builder-0.1.2-Linux-aarch64.sh Dockerfile
+all: qemu-aarch64-static Archiconda3-0.2.0-Linux-aarch64.sh Dockerfile
 	docker build . -t archiconda/centos7:archiconda3builder
 
 clean:
@@ -11,7 +11,7 @@ upload:
 qemu-aarch64-static: /usr/bin/qemu-aarch64-static
 	cp /usr/bin/qemu-aarch64-static .
 
-Archiconda3Builder-0.1.2-Linux-aarch64.sh: ../installer/Archiconda3/construct.yaml ../installer/installer_license.txt
+Archiconda3-0.2.0-Linux-aarch64.sh: ../installer/Archiconda3/construct.yaml ../installer/installer_license.txt
 	constructor --platform=linux-aarch64 ../installer/Archiconda3
 
 

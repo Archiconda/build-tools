@@ -36,6 +36,13 @@ RUN bash -c "rm -f /usr/bin/{ar,addr2line,as,c++filt,dwp,elfedit,gprof,ld,ld.bfd
 
 
 ENV PATH="/root/archiconda3/bin:${PATH}"
-COPY Archiconda3Builder-0.1.2-Linux-aarch64.sh /.
-RUN sh /Archiconda3Builder-0.1.2-Linux-aarch64.sh -b -p /root/archiconda3
+#COPY Archiconda3Builder-0.1.2-Linux-aarch64.sh /.
+#RUN sh /Archiconda3Builder-0.1.2-Linux-aarch64.sh -b -p /root/archiconda3
+COPY Archiconda3-0.2.0-Linux-aarch64.sh /.
+RUN sh /Archiconda3-0.2.0-Linux-aarch64.sh -b -p /root/archiconda3
+
+ENV PATH="/root/archiconda3/bin:${PATH}"
+RUN conda config --add channels conda-forge
+RUN conda install conda-build
+
 

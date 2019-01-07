@@ -1,17 +1,17 @@
-name: Archiconda3Builder
-version: 0.1.2
+name: Archiconda3
+version: 0.2.0
 
 channels:
   - https://conda.anaconda.org/archiarm
-  - https://conda.anaconda.org/c4aarch64
-  - https://conda.anaconda.org/jjhelmus/label/aarch64_bootstrap
+  #- https://conda.anaconda.org/jjhelmus/label/aarch64_bootstrap
 
 write_condarc: True
 license_file: ../installer_license.txt
 
 specs:
-  - python 3.7
+  #- python 2.7.15
+  - python 3.7.1
   - conda
   - pip
-  - anaconda-client
-  - conda-build
+  #- anaconda-client
+  #- conda-build
