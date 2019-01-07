@@ -1,0 +1,494 @@
+blas_impl:
+  # mkl-devel packages are available, and conda-forge could enable them if they'd like
+  # - mkl                        # [x86 or x86_64]
+  - openblas
+# This differs from target_platform in that it determines what subdir the compiler
+#    will target, not what subdir the compiler package will be itself.
+#    For example, we need a win-64 vs2008_win-32 package, so that we compile win-32
+#    code on win-64 miniconda.
+cross_compiler_target_platform:  # [win]
+  - win-64                     # [win]
+c_compiler:
+  - toolchain_c                # [linux64 or osx]
+  # new compilers
+  - gcc                        # [linux                               and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+  - clang                      # [osx                                 and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+  - gcc                        # [ppc64le]
+
+  - vs2008                     # [win]
+  - vs2015                     # [win]
+  - vs2015                     # [win and (environ.get('CF_MAX_PY_VER', '') >= '37')]
+cxx_compiler:
+  - toolchain_cxx              # [linux64 or osx]
+  # new compilers
+  - gxx                        # [linux                               and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+  - clangxx                    # [osx                                 and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+  - gxx                        # [ppc64le]
+
+  - vs2008                     # [win]
+  - vs2015                     # [win]
+  - vs2015                     # [win and (environ.get('CF_MAX_PY_VER', '') >= '37')]
+fortran_compiler:              # [unix or win64]
+  - toolchain_fort             # [(linux64 or osx) and not ppc64le]
+  - gfortran                   # [(linux or osx)                      and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+  - gfortran                   # [ppc64le]
+  - flang                      # [win64]
+m2w64_c_compiler:              # [win]
+  - m2w64-toolchain            # [win]
+m2w64_cxx_compiler:            # [win]
+  - m2w64-toolchain            # [win]
+m2w64_fortran_compiler:        # [win]
+  - m2w64-toolchain            # [win]
+go_compiler:
+  - go
+macos_min_version:             # [osx]
+  - 10.9                       # [osx]
+macos_machine:                 # [osx]
+  - x86_64-apple-darwin13.4.0  # [osx]
+MACOSX_DEPLOYMENT_TARGET:      # [osx]
+  - 10.9                       # [osx]
+target_platform:
+  - win-64                     # [win]
+VERBOSE_AT:
+  - V=1
+VERBOSE_CM:
+  - VERBOSE=1
+
+# dual build configuration
+channel_sources:
+  - archiarm,                        # [aarch64]
+  - conda-forge,defaults                        # [not aarch64]
+  - conda-forge/label/gcc7,defaults             # [(linux64 or osx)     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+BUILD: aarch64-conda_cos7-linux-gnu  # [aarch64]
+
+channel_targets:
+  - conda-forge main                            # [not aarch64]
+  - archiarm main                               # [aarch64]
+  - conda-forge gcc7                            # [(linux64 or osx)     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+docker_image:                                   # [linux64 or ppc64le]
+  - condaforge/linux-anvil                      # [linux64]
+  - condaforge/linux-anvil-comp7                # [linux64              and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+  - condaforge/ppc-anvil                        # [ppc64le]
+
+build_number_decrement:                         # [(linux64 or osx)     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+  - 1000                                        # [(linux64 or osx)     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+  - 0                                           # [(linux64 or osx)     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+zip_keys:
+  -
+    - pyqt
+    - qt
+  -
+    - python
+    - vc                        # [win]
+    - c_compiler                # [win]
+    - cxx_compiler              # [win]
+
+  # Dual compiler zip
+  -                             # [not aarch64 and                        (environ.get('CF_COMPILER_STACK') == 'comp7')]
+    - c_compiler                # [(linux64 or osx)                     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+    - cxx_compiler              # [(linux64 or osx)                     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+    - fortran_compiler          # [(linux64 or osx)                     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+    - channel_sources           # [(linux64 or osx)                     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+    - channel_targets           # [(linux64 or osx)                     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+    - docker_image              # [linux64                              and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+    - build_number_decrement    # [(linux64 or osx)                     and (environ.get('CF_COMPILER_STACK') == 'comp7')]
+
+# TODO: remove these when run_exports are added to the packages.
+pin_run_as_build:
+  arpack:
+    max_pin: x.x.x
+  boost:
+    max_pin: x.x.x
+  boost-cpp:
+    max_pin: x.x.x
+  bzip2:
+    max_pin: x
+  cairo:
+    max_pin: x.x
+  curl:
+    max_pin: x
+  dbus:
+    max_pin: x
+  expat:
+    max_pin: x.x
+  ffmpeg:
+    max_pin: x.x
+  flann:
+    max_pin: x.x.x
+  fontconfig:
+    max_pin: x
+  freetype:
+    max_pin: x
+  gsl:
+    max_pin: x.x
+  gstreamer:
+    max_pin: x.x
+  gst-plugins-base:
+    max_pin: x.x
+  gdal:
+    max_pin: x.x
+  geos:
+    max_pin: x.x.x
+  geotiff:
+    max_pin: x.x
+  giflib:
+    max_pin: x.x
+  glew:
+    max_pin: x.x
+  glib:
+    max_pin: x.x
+  glpk:
+    max_pin: x.x
+  gmp:
+    max_pin: x
+  graphviz:
+    max_pin: x
+  harfbuzz:
+    max_pin: x
+  hdf4:
+    max_pin: x.x
+  icu:
+    max_pin: x
+  isl:
+    max_pin: x.x
+  jasper:
+    max_pin: x
+  jpeg:
+    max_pin: x
+  libjpeg_turbo:
+    max_pin: x
+  json-c:
+    max_pin: x.x
+  jsoncpp:
+    max_pin: x.x.x
+  kealib:
+    max_pin: x.x
+  krb5:
+    max_pin: x.x
+  libblitz:
+    max_pin: x.x
+  libdap4:
+    max_pin: x.x
+  libevent:
+    max_pin: x.x.x
+  libffi:
+    max_pin: x.x
+  libgdal:
+    max_pin: x.x
+  libiconv:
+    max_pin: x.x
+  libkml:
+    max_pin: x.x
+  libmatio:
+    max_pin: x.x
+  libnetcdf:
+    max_pin: x.x
+  libpcap:
+    max_pin: x.x
+  libpng:
+    max_pin: x.x
+  libprotobuf:
+    max_pin: x.x
+  librdkafka:
+    max_pin: x.x.x
+  libssh2:
+    max_pin: x.x
+  libsvm:
+    max_pin: x.x
+  libunwind:
+    max_pin: x.x
+  libtiff:
+    max_pin: x
+  libwebp:
+    max_pin: x.x
+  libxml2:
+    max_pin: x.x
+  libuuid:
+    max_pin: x
+  lz4-c:
+    max_pin: x.x.x
+  lzo:
+    max_pin: x
+  metis:
+    max_pin: x.x
+  mkl:
+    max_pin: x
+  mpfr:
+    max_pin: x
+  ncurses:
+    max_pin: x.x
+  netcdf-cxx4:
+    max_pin: x.x
+  netcdf-fortran:
+    max_pin: x.x
+  nettle:
+    max_pin: x.x
+  nlopt:
+    max_pin: x.x.x
+  occt:
+    max_pin: x.x
+  openblas:
+    max_pin: x.x.x
+  openturns:
+    max_pin: x.x
+  openjpeg:
+    max_pin: x.x
+  openssl:
+    max_pin: x.x.x
+  pango:
+    max_pin: x.x
+  perl:
+    max_pin: x.x.x
+  pixman:
+    max_pin: x.x
+  poppler:
+    max_pin: x.x
+  proj4:
+    max_pin: x.x.x
+  pyqt:
+    max_pin: x.x
+  qt:
+    max_pin: x.x
+  readline:
+    max_pin: x
+  r-base:
+    max_pin: x.x.x
+  snappy:
+    max_pin: x.x.x
+  sox:
+    max_pin: x.x.x
+  sqlite:
+    max_pin: x
+  tk:
+    max_pin: x.x
+  vc:
+    max_pin: x
+  vlfeat:
+    max_pin: x.x.x
+  vtk:
+    max_pin: x.x.x
+  xerces-c:
+    max_pin: x.x.x
+  xz:
+    max_pin: x.x
+  zeromq:
+    max_pin: x.x
+  zlib:
+    max_pin: x.x
+  zstd:
+    max_pin: x.x.x
+
+
+# Pinning packages
+arpack:
+  - 3.6.3
+boost:
+  - 1.68.0
+boost_cpp:
+  - 1.68.0
+bzip2:
+  - 1
+cairo:
+  - 1.16
+curl:
+  - 7.63
+dbus:
+  - 1
+expat:
+  - 2.2
+ffmpeg:
+  - 4.0
+flann:
+  - 1.9.1
+fontconfig:
+  - 2.13
+freetype:
+  - 2.9.1
+gf2x:
+  - 1.2
+gsl:
+  - 2.4
+gstreamer:
+  - 1.12  # [linux]
+  - 1.14.0  # [osx]
+gst_plugins_base:
+  - 1.12  # [linux]
+  - 1.14.0  # [osx]
+gdal:
+  - 2.3
+geos:
+  - 3.7.0
+geotiff:
+  - 1.4.2
+giflib:
+  - 5.1
+glew:
+  - 2.0.0
+glib:
+  - 2.58
+glpk:
+  - 4.65
+gmp:
+  - 6
+graphviz:
+  - 2.38.0
+harfbuzz:
+  - 1
+hdf4:
+  - 4.2
+hdf5:
+  - 1.10.4
+icu:
+  - 58
+isl:
+  - 0.19
+jasper:
+  - 1.900.1
+jpeg:
+  - 9
+libjpeg_turbo:
+  - 2
+json_c:
+  - 0.13
+jsoncpp:
+  - 1.8.4
+kealib:
+  - 1.4.10
+krb5:
+  - 1.16
+libblitz:
+  - 0.10
+libdap4:
+  - 3.19
+libevent:
+  - 2.0.22
+libffi:
+  - 3.2
+libgdal:
+  - 2.3
+libiconv:
+  - 1.15
+libkml:
+  - 1.3
+libmatio:
+  - 1.5
+libnetcdf:
+  - 4.6
+libpcap:
+  - 1.8
+libpng:
+  - 1.6.35
+libprotobuf:
+  - 3.5
+librdkafka:
+  - 0.11.5
+libsecret:
+  - 0.18
+libssh2:
+  - 1.8
+libsvm:
+  - 3.21
+libtiff:
+  - 4.0.9
+libunwind:
+  - 1.2
+libwebp:
+  - 1.0.0
+libxml2:
+  - 2.9
+libuuid:
+  - 2.32.1
+lz4_c:
+  - 1.8.1
+lzo:
+  - 2
+metis:
+  - 5.1
+mkl:
+  - 2018
+mpfr:
+  - 4
+ncurses:
+  - 6.1
+netcdf_cxx4:
+  - 4.3
+netcdf_fortran:
+  - 4.4
+nettle:
+  - 3.4
+nlopt:
+  - 2.5.*
+ntl:
+  - 11.3.1
+# we build for an old version of numpy for forward compatibility
+#    1.11 seems to be the oldest on win that works with scipy 0.19.  Compiler errors otherwise.
+numpy:
+  - 1.9   # [unix]
+  - 1.11   # [win]
+occt:
+  - 7.3
+openblas:
+  - 0.3.3
+openjpeg:
+  - 2.3
+openssl:
+  - 1.0.2
+openturns:
+  - 1.12*
+pango:
+  - 1.40
+perl:
+  - 5.26
+pixman:
+  - 0.34
+poppler:
+  - 0.67.0
+proj4:
+  - 5.2.0
+python:
+  - 2.7
+  - 3.6
+  - 3.7  # [(environ.get('CF_MAX_PY_VER', '') >= '37')]
+pyqt:
+  - 5.6
+qt:
+  - 5.6
+readline:
+  - 7.0
+r_base:
+  - 3.5.1
+snappy:
+  - 1.1.7
+sox:
+  - 14.4.2
+sqlite:
+  - 3
+tk:
+  - 8.6                # [not ppc64le]
+vc:                    # [win]
+  - 9                  # [win]
+  - 14                 # [win]
+  - 14                 # [win and (environ.get('CF_MAX_PY_VER', '') >= '37')]
+vlfeat:
+  - 0.9.20
+vtk:
+  - 8.1.1
+x264:
+  - 1!152.*
+xerces_c:
+  - 3.2.2
+xz:
+  - 5.2
+zeromq:
+  - 4.2.5
+zlib:
+  - 1.2
+zstd:
+  - 1.3.3
