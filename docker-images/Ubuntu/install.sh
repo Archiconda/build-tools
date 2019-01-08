@@ -11,10 +11,10 @@ locale-gen en_US.UTF-8
 echo "================== Successfully Installed gcc 7 ==============="
 
 echo "======================== Installing Archiconda3 ==============="
-echo yes | /install/Archiconda3-0.1.1-Linux-aarch64.sh -b
+echo yes | /install/Archiconda3-0.2.0-Linux-aarch64.sh -b
 export PATH=/root/archiconda3/bin:$PATH
 conda update --all --yes
-conda install anaconda-client conda-build --yes
+#conda install anaconda-client conda-build --yes
 conda clean --all --yes
 source /root/archiconda3/bin/activate root
 echo "============ Successfully Installed Archiconda3 ==============="

@@ -431,7 +431,8 @@ ntl:
 # we build for an old version of numpy for forward compatibility
 #    1.11 seems to be the oldest on win that works with scipy 0.19.  Compiler errors otherwise.
 numpy:
-  - 1.9   # [unix]
+  - 1.9   # [linux64 and osx]
+  - 1.9   # [aarch64]
   - 1.11   # [win]
 occt:
   - 7.3

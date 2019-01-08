@@ -32,7 +32,7 @@ RUN yum install -y \
 
 # Remove the centos binutils tools so that we make sure we arn't using them accidentally
 # You can't remove these with yum because apparently it would delete the whole system.
-RUN bash -c "rm -f /usr/bin/{ar,addr2line,as,c++filt,dwp,elfedit,gprof,ld,ld.bfd,ld.gold,nm,objcopy,objdump,ranlib,readlef,size,strings,strip}"
+# RUN bash -c "rm -f /usr/bin/{ar,addr2line,as,c++filt,dwp,elfedit,gprof,ld,ld.bfd,ld.gold,nm,objcopy,objdump,ranlib,readlef,size,strings,strip}"
 
 
 ENV PATH="/root/archiconda3/bin:${PATH}"
