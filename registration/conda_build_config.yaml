@@ -346,7 +346,8 @@ hdf4:
 hdf5:
   - 1.10.4
 icu:
-  - 58
+  - 58   # [not aarch64]
+  - 60   # [aarch64]
 isl:
   - 0.19
 jasper:
