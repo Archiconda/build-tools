@@ -457,7 +457,7 @@ poppler:
 proj4:
   - 5.2.0
 python:
-  - 2.7
+  - 2.7  # [not aarch64]
   - 3.6
   - 3.7  # [(environ.get('CF_MAX_PY_VER', '') >= '37')]
 pyqt:
