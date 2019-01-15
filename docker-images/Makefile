@@ -1,12 +1,12 @@
 all: qemu-aarch64-static Archiconda3-0.2.2-Linux-aarch64.sh Dockerfile
-	docker build . -t archiconda/centos7:archiconda3builder
+	docker build . -t archiconda/centos7:builder
 
 clean:
 	rm qemu-aarch64-static
 	rm Archiconda3*.sh
 
 upload:
-	docker push archiconda/centos7
+	docker push archiconda/centos7:builder
 
 qemu-aarch64-static: /usr/bin/qemu-aarch64-static
 	cp /usr/bin/qemu-aarch64-static .
