@@ -29,6 +29,7 @@ RUN yum install -y \
   which \
   bzip2 \
   xorg-x11-server-Xvfb \
+  git \
   && yum clean all
 
 # sudo is necessary for shippable to boot up the container
@@ -52,6 +53,7 @@ RUN rm Archiconda3-0.2.3-Linux-aarch64.sh
 
 ENV PATH="/root/archiconda3/bin:${PATH}"
 RUN conda config --add channels conda-forge
+RUN conda config --add channels c4aarch64
 RUN conda install conda-build
 RUN conda install anaconda-client
 

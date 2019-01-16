@@ -385,7 +385,8 @@ libnetcdf:
 libpcap:
   - 1.8
 libpng:
-  - 1.6.35
+  - 1.6.35   # [not aarch64]
+  - 1.6.36   # [aarch64]
 libprotobuf:
   - 3.5
 librdkafka:
@@ -397,7 +398,8 @@ libssh2:
 libsvm:
   - 3.21
 libtiff:
-  - 4.0.9
+  - 4.0.9    # [not aarch64]
+  - 4.0.10   # [aarch64]
 libunwind:
   - 1.2
 libwebp:

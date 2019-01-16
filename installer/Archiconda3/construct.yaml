@@ -11,9 +11,6 @@ write_condarc: True
 license_file: ../installer_license.txt
 
 specs:
-  #- python 2.7.15
   - python 3.7.1
   - conda
   - pip
-  #- anaconda-client
-  #- conda-build
