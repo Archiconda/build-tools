@@ -1,9 +1,9 @@
 name: Archiconda3
-version: 0.2.2
+version: 0.2.3
 
 channels:
   - https://conda.anaconda.org/c4aarch64
-  - https://conda.anaconda.org/archiarm
+  # - https://conda.anaconda.org/archiarm
   - https://conda.anaconda.org/conda-forge
   #- https://conda.anaconda.org/jjhelmus/label/aarch64_bootstrap
 

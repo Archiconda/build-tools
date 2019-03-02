@@ -46,9 +46,9 @@ RUN yum install -y \
 ENV PATH="/root/archiconda3/bin:${PATH}"
 #COPY Archiconda3Builder-0.1.2-Linux-aarch64.sh /.
 #RUN sh /Archiconda3Builder-0.1.2-Linux-aarch64.sh -b -p /root/archiconda3
-COPY Archiconda3-0.2.2-Linux-aarch64.sh /.
-RUN sh /Archiconda3-0.2.2-Linux-aarch64.sh -b -p /root/archiconda3
-RUN rm Archiconda3-0.2.2-Linux-aarch64.sh
+COPY Archiconda3-0.2.3-Linux-aarch64.sh /.
+RUN sh /Archiconda3-0.2.3-Linux-aarch64.sh -b -p /root/archiconda3
+RUN rm Archiconda3-0.2.3-Linux-aarch64.sh
 
 ENV PATH="/root/archiconda3/bin:${PATH}"
 RUN conda config --add channels conda-forge
