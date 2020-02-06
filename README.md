@@ -1,3 +1,10 @@
+# Notice
+This project has been superseded by `miniforge`, a project by conda-forge.
+
+See:
+- https://github.com/conda-forge/miniforge
+- https://conda-forge.org/status/
+
 # Archiconda3
 
 This repository holds many configuration scripts for the Archiconda3 distribution.
